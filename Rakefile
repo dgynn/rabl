@@ -40,11 +40,17 @@ end
 
 desc "Executes the fixture tests"
 task "test:fixtures" do
-  Dir[File.dirname(__FILE__) + "/fixtures/#{fixture_list}"].each do |fixture|
+  results = Dir[File.dirname(__FILE__) + "/fixtures/#{fixture_list}"].map do |fixture|
     puts "\n*** Running tests for #{File.basename(fixture)}... ***\n"
     Bundler.with_clean_env {
-      Dir.chdir(fixture) { puts `bundle check; bundle exec rake test:rabl` }
+      Dir.chdir(fixture) { puts `bundle check && bundle exec rake test:rabl` }
     }
+    puts "\n!!! Tests failed for #{fixture} !!!\n" unless $?.exitstatus == 0
+
+    $?.exitstatus
+  end
+  if results.any? { |exitstatus| exitstatus > 0 }
+    raise 'Tests failed'
   end
 end
 
