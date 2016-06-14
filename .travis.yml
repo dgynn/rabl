@@ -13,3 +13,5 @@ notifications:
     - databyte@gmail.com
 before_install:
   - gem install bundler
+before_script: bundle exec rake test:clean test:setup
+script: bundle exec rake test:full
